@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+name: openstackweekly
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+description: openstackweekly scrapper
+home: https://github.com/zufardhiyaulhaq/openstackweekly
+keywords:
+  - weekly
+  - openstackweekly
