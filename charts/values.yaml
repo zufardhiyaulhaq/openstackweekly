@@ -20,17 +20,17 @@ github:
   token: "your_token"
   organization: "zufardhiyaulhaq"
   repository: "community-ops"
-  repository_path: "./manifest/golang-community/"
+  repository_path: "./manifest/openstack-community/"
   branch: "master"
 
 # community name for CRDs
-community: "Golang Indonesia Community"
+community: "OpenStack Indonesia Community"
 
 # tag for CRDs
-tags: "weekly,golang"
+tags: "weekly,openstack"
 
 # namespace for CRDs
-namespace: "golang-community"
+namespace: "openstack-community"
 
 # image for CRDs
 image_url: "https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-images-prod/openstack-logo/OpenStack-Logo-Vertical.png"

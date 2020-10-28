@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/zufardhiyaulhaq/openstackweekly/handlers"
 	"github.com/zufardhiyaulhaq/openstackweekly/models"
-	"github.com/zufardhiyaulhaq/openstackweekly/pkg/scrappers"
+	"github.com/zufardhiyaulhaq/openstackweekly/scrappers"
 	"gopkg.in/yaml.v2"
 	// communityv1alpha1 "github.com/cloudnative-id/community-operator/pkg/apis/community/v1alpha1"
-	// "github.com/zufardhiyaulhaq/openstackweekly/handlers"
 )
 
 func main() {
@@ -20,20 +20,28 @@ func main() {
 	// Init scrapper
 	scrapper := scrappers.OpenstackWeekly{}
 
-	// get current content
-	var currentContent models.OpenStackContents
+	// initialize content
+	var content models.OpenStackContents
 
-	currentContentTmpl := session.GetFile("content.yaml")
-	err := yaml.Unmarshal(currentContentTmpl, &currentContent)
+	// check current content file exist
+	if !handler.FileExist("content.yaml") {
+		newContent, err := yaml.Marshal(content)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		CreateFile(handler, "content.yaml", "init OpenStack Weekly content file", newContent)
+	}
+
+	// get current content
+	contentTmpl := handler.GetFile("content.yaml")
+	err := yaml.Unmarshal(contentTmpl, &content)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println(currentContent)
-
-	// // feed current content to scrapper
-	// openstackWeekluData := scrapper.GetWeekly(currentContent)
-
+	// feed current content to scrapper
+	openstackWeekluData := scrapper.GetWeekly(content)
 
 	// // get latest weekly from handlers
 	// recentWeeklyNames := GetFiles(handler)

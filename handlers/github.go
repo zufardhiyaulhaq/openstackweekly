@@ -41,6 +41,17 @@ func (g *Github) credentials() {
 	g.Options = &github.RepositoryContentGetOptions{Ref: g.Branch}
 }
 
+func (g *Github) FileExist(file string) bool {
+	context := context.Background()
+
+	_, err := g.Session.Repositories.DownloadContents(context, g.Organization, g.Repository, g.Path+file, nil)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (g *Github) GetFile(file string) []byte {
 	context := context.Background()
 
@@ -51,6 +62,22 @@ func (g *Github) GetFile(file string) []byte {
 
 	body, _ := ioutil.ReadAll(rawData)
 	return body
+}
+
+func (g *Github) GetFiles() []string {
+	var files []string
+	context := context.Background()
+
+	_, dir, _, err := g.Session.Repositories.GetContents(context, g.Organization, g.Repository, g.Path, g.Options)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, v := range dir {
+		files = append(files, *v.Name)
+	}
+
+	return files
 }
 
 func (g *Github) CreateFile(fileName string, commitMessage string, fileData []byte) {
