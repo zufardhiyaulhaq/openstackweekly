@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"strings"
 	"time"
 
+	communityv1alpha1 "github.com/cloudnative-id/community-operator/pkg/apis/community/v1alpha1"
 	"github.com/zufardhiyaulhaq/openstackweekly/handlers"
 	"github.com/zufardhiyaulhaq/openstackweekly/models"
-	"github.com/zufardhiyaulhaq/openstackweekly/scrappers"
+	"github.com/zufardhiyaulhaq/openstackweekly/pkg/scrappers"
 	"gopkg.in/yaml.v2"
-	// communityv1alpha1 "github.com/cloudnative-id/community-operator/pkg/apis/community/v1alpha1"
 )
 
 func main() {
@@ -37,48 +37,59 @@ func main() {
 	contentTmpl := handler.GetFile("content.yaml")
 	err := yaml.Unmarshal(contentTmpl, &content)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
+	currentContentLength := len(content.Content)
 
 	// feed current content to scrapper
-	openstackWeekluData := scrapper.GetWeekly(content)
+	openstackWeeklycontent := scrapper.GetOpenStackWeekly(content)
+	openstackWeeklycontentByte, err := yaml.Marshal(openstackWeeklycontent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	newContentLength := len(openstackWeeklycontent.Content)
 
-	// // get latest weekly from handlers
-	// recentWeeklyNames := GetFiles(handler)
+	if newContentLength != currentContentLength {
+		handler.UpdateFile("content.yaml", "update OpenStack Weekly content", openstackWeeklycontentByte)
+	} else {
+		log.Printf("[openstackweekly] no update about OpenStack")
+		return
+	}
 
-	// compare weekly logic
-	// compare newest weekly from scrapper
-	// with latest list of weekly from datastore
-	// newestWeeklyName := scrapper.GetWeeklyName()
-	// for _, v := range recentWeeklyNames {
-	// 	if strings.ToLower(strings.ReplaceAll(newestWeeklyName, " ", "-"))+".yaml" == v {
-	// 		log.Println("Weekly already in datastore")
-	// 		return
-	// 	}
-	// }
-
-	// Scapper logic
-	// must return list fo ArticleSpec defined in community-operator
 	// communityv1alpha1 "github.com/cloudnative-id/community-operator/pkg/apis/community/v1alpha1"
-	// var weekly []communityv1alpha1.ArticleSpec
-	// weekly = scrapper.GetWeekly()
+	var weeklyName string
+	var weeklyData []communityv1alpha1.ArticleSpec
 
-	// Init builder
-	// builder := Builder{}
+	// populate weeklyData from openstackWeeklycontent
+	for index, value := range openstackWeeklycontent.Content {
+		if !value.IsDelivered {
+			var data communityv1alpha1.ArticleSpec
+			data.Title = value.Title
+			data.Url = value.Url
+			data.Type = value.Kind
+			weeklyData = append(weeklyData, data)
+			openstackWeeklycontent.Content[index].IsDelivered = true
+		}
+	}
+
+	// push the updated content.yaml
+	openstackWeeklycontentByte, err = yaml.Marshal(openstackWeeklycontent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	handler.UpdateFile("content.yaml", "update OpenStack Weekly content", openstackWeeklycontentByte)
+
+	//Init builder
+	builder := Builder{}
 
 	// Build
 	location, _ := time.LoadLocation("Asia/Jakarta")
 	time := time.Now().In(location).Format("02-01-2006")
-	name := "OpenStack Weekly " + time
-	fmt.Println(name)
-	// builder.build(name, weekly)
+	weeklyName = "OpenStack Weekly " + time
 
-	// Add to Github
-	// crd, err := yaml.Marshal(builder)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	builder.build(weeklyName, weeklyData)
+	weeklyCRD, err := yaml.Marshal(builder)
 
-	// commitMessage := "Weekly: Add " + newestWeeklyName
-	// CreateFile(handler, strings.ToLower(strings.ReplaceAll(newestWeeklyName, " ", "-"))+".yaml", commitMessage, crd)
+	commitMessage := "Weekly: Add " + weeklyName
+	CreateFile(handler, strings.ToLower(strings.ReplaceAll(weeklyName, " ", "-"))+".yaml", commitMessage, weeklyCRD)
 }

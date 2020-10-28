@@ -1,5 +1,5 @@
 # Openstackweekly
-Get data from golangweekly.com and create Weekly CRDs based on community-operator & push to github
+Get data from openstackweekly.com and create Weekly CRDs based on community-operator & push to github
 
 ### Developing locally
 - export variable for developing
@@ -28,10 +28,10 @@ export GITHUB_BRANCH="master"
 export COMMUNITY="OpenStack Indonesia Community"
 
 # Tags for the weekly
-export TAGS="weekly,golang"
+export TAGS="weekly,openstack"
 
 # Namespace for weekly
-export NAMESPACE="golang-community"
+export NAMESPACE="openstack-community"
 
 # Image URL for weekly
 export IMAGE="https://trungtq.com/wp-content/uploads/2018/12/GO-3.png"

@@ -104,3 +104,29 @@ func (g *Github) CreateFile(fileName string, commitMessage string, fileData []by
 		log.Fatal(err)
 	}
 }
+
+func (g *Github) UpdateFile(fileName string, commitMessage string, fileData []byte) {
+	context := context.Background()
+
+	res, _, _, err := g.Session.Repositories.GetContents(context, g.Organization, g.Repository, g.Path+fileName, g.Options)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, _, err = g.Session.Repositories.UpdateFile(
+		context,
+		g.Organization,
+		g.Repository,
+		g.Path+fileName,
+		&github.RepositoryContentFileOptions{
+			Message: &commitMessage,
+			Content: fileData,
+			Branch:  &g.Branch,
+			SHA:     github.String(res.GetSHA()),
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
