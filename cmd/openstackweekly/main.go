@@ -51,6 +51,7 @@ func main() {
 
 	if newContentLength != currentContentLength {
 		handler.UpdateFile("content.yaml", "update OpenStack Weekly content", openstackWeeklycontentByte)
+		log.Printf("[openstackweekly] Update content with new weekly content")
 	} else {
 		log.Printf("[openstackweekly] no update about OpenStack")
 		return
@@ -78,13 +79,13 @@ func main() {
 		log.Fatal(err)
 	}
 	handler.UpdateFile("content.yaml", "update OpenStack Weekly content", openstackWeeklycontentByte)
+	log.Printf("[openstackweekly] Update delivered status content")
 
 	//Init builder
 	builder := Builder{}
 
 	// Build
-	location, _ := time.LoadLocation("Asia/Jakarta")
-	time := time.Now().In(location).Format("02-01-2006")
+	time := time.Now().Format("02-01-2006")
 	weeklyName = "OpenStack Weekly " + time
 
 	builder.build(weeklyName, weeklyData)
@@ -92,4 +93,5 @@ func main() {
 
 	commitMessage := "Weekly: Add " + weeklyName
 	CreateFile(handler, strings.ToLower(strings.ReplaceAll(weeklyName, " ", "-"))+".yaml", commitMessage, weeklyCRD)
+	log.Printf("[openstackweekly] Create Weekly manifest")
 }
