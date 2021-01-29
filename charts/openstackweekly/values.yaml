@@ -9,7 +9,7 @@ cronSchedule: "0 8 * * 0"
 image:
   name: "openstackweekly"
   repository: "zufardhiyaulhaq/openstackweekly"
-  tag: "latest"
+  tag: "0.0.1"
 
 #############################
 # envoronment configuration #

@@ -1,5 +1,5 @@
-# Openstackweekly
-Get data from openstackweekly.com and create Weekly CRDs based on community-operator & push to github
+# openstackweekly charts
+Helm chart for openstackweeklys
 
 ### Installing the charts
 From root directory of openstackweekly. Please edit the values.yaml inside charts before applying.
@@ -26,3 +26,5 @@ helm install zufardhiyaulhaq/openstackweekly --name-template openstackweekly -f 
 | jobHistoryLimit | int | `1` |  |
 | namespace | string | `"openstack-community"` |  |
 | tags | string | `"weekly,openstack"` |  |
+
+check & modify values.yaml for details
